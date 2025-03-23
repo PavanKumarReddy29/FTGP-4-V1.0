@@ -69,9 +69,7 @@ abstract contract DepositManager {
         return (principal, interest);
     }
 
-    /**
-     * @dev View function to get deposit details
-     */
+    // View function to get deposit details
     function getDepositDetails(address user, uint256 depositIndex) 
         external view returns (uint256 amount, uint256 lockPeriod, uint256 depositTime, uint256 interestRate, uint256 liquidityTokens, bool withdrawn) 
     {
