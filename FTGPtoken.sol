@@ -4,11 +4,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./currConverter.sol";
+import "./tokenTransfer.sol";
 
 contract FTGPtoken is ERC20, currConverter, Ownable {
     uint256 public constant TOKEN_PRICE_IN_USD = 1 * 10**8; // 1 FTGP = $1
-    // uint256 public constant DISPLAY_PRECISION = 10**2; // 2 decimal places for display (e.g., 1.29 as 129)
     
+    // Mapping to track token balances tied to a specific redemption currency
+    mapping(address => mapping(string => uint256)) public currencyLockedBalances;
 
     constructor() 
         ERC20("FTGPtoken", "FTGP") 
@@ -23,70 +25,29 @@ contract FTGPtoken is ERC20, currConverter, Ownable {
         priceFeeds[currency] = AggregatorV3Interface(priceFeedAddress);
     }
     // This function displays the current exchange rate.
-    function getExchangeRate(string memory currency) public override view virtual returns (uint256) {
-        if (keccak256(abi.encodePacked(currency)) == keccak256(abi.encodePacked(baseCurrency))){
-            return (TOKEN_PRICE_IN_USD* DISPLAY_PRECISION) / 10**8;
-        }else{
-            AggregatorV3Interface priceFeed = priceFeeds[currency];
-            require(address(priceFeed) != address(0), "Price feed not set for currency");
-            (, int256 price, , , ) = priceFeed.latestRoundData();
-            require(price > 0, "Invalid price data from feed");
-            uint256 rate = uint256(price); // e.g., 129000000
-            return (rate * DISPLAY_PRECISION) / 10**8; // e.g., 129
-        }
+    function getRateForCurrency(string memory currency) public view returns (uint256) {
+        return getExchangeRate(currency); // Calls the inherited function from CurrencyConverter
     }
 
-    // Preview conversion in human-readable format (e.g., 100 GBP to EUR as ~118.18)
-    // This logic display the possible number of tokens you can convert with the given amount.
+    // Preview conversion (view function)
     function previewConversion(
         string memory fromCurrency,
         string memory toCurrency,
         uint256 amount
     ) public view returns (uint256 displayAmount) {
-        require(
-            keccak256(abi.encodePacked(fromCurrency)) != keccak256(abi.encodePacked(toCurrency)),
-            "Cannot convert to the same currency"
-        );
-
-        // Step 1: Convert fromCurrency to USD
-        uint256 fromRate = (keccak256(abi.encodePacked(fromCurrency)) == keccak256(abi.encodePacked(baseCurrency))) 
-            ? 1e2 : getExchangeRate(fromCurrency); 
-        uint256 usdAmount = (amount * fromRate) / 10**2; 
-
-        // Step 2: Convert USD to toCurrency
-        uint256 toRate = (keccak256(abi.encodePacked(toCurrency)) == keccak256(abi.encodePacked(baseCurrency))) 
-            ? 1e2 : getExchangeRate(toCurrency); 
-        require(toRate > 0, "Target currency rate is zero");
-        uint256 targetAmount = (usdAmount * 10**18) / toRate;
-
-        // Scale for display (e.g., 118.1818e18 tokens → 11818 for 118.18)
-        displayAmount = (targetAmount * DISPLAY_PRECISION) / 10**18;
+        displayAmount = calculateConversion(fromCurrency, toCurrency, amount);
         return displayAmount;
     }
-    // Debug function to inspect all latestRoundData values
-    // function getPriceFeedData(string memory currency) public view returns (
-    //     uint80 roundId,
-    //     int256 price,
-    //     uint256 startedAt,
-    //     uint256 timeStamp,
-    //     uint80 answeredInRound
-    // ) {
-    //     AggregatorV3Interface priceFeed = priceFeeds[currency];
-    //     require(address(priceFeed) != address(0), "Price feed not set for currency");
-    //     return priceFeed.latestRoundData();
-    // }
 
-    // Wrapper function to call convert from currConverter and mint the required tokens.
+    // Convert and mint
     function convertAndMint(
         string memory fromCurrency,
-        string memory toCurrency,
         uint256 amount
     ) public {
-        // Call the parent convert function and get the target amount
-        uint256 targetAmount = previewConversion(fromCurrency, toCurrency, amount);
-        
-        // Mint the target amount to the sender
-        _mint(msg.sender, targetAmount);
+        uint256 tokenAmount = convert(fromCurrency, amount);
+        require(tokenAmount > 0, "Invalid token amount");
+        _mint(msg.sender, tokenAmount);
+        emit Converted(msg.sender, fromCurrency, amount, tokenAmount);
     }
 
     // Function to mint the tokens. No actual use, can be disabled.
@@ -105,6 +66,15 @@ contract FTGPtoken is ERC20, currConverter, Ownable {
     // function to Debug (retriving the chainlink pricefeed address)
     function getPriceFeedAddress(string memory currency) public view returns (address) {
         return address(priceFeeds[currency]);
+    }
+    /**
+     * @dev Function to transfer tokens using TransferLib
+     * @param receiver The address to send tokens to
+     * @param amount The amount of tokens to transfer
+     */
+    function transferTokens(address receiver, uint256 amount) public returns (bool) {
+        uint256 amountInTokens = amount * 10**18;
+        return tokenTransfer.safeTransfer(IERC20(address(this)), msg.sender, receiver, amountInTokens);
     }
 
 }
