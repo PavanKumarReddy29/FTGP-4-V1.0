@@ -5,8 +5,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./currConverter.sol";
 import "./tokenTransfer.sol";
+import "./redemption.sol";
+import "./deposit_logic.sol";
 
-contract FTGPtoken is ERC20, currConverter, Ownable {
+contract FTGPtoken is ERC20, currConverter,Ownable,FTGPDepositLogic {
     uint256 public constant TOKEN_PRICE_IN_USD = 1 * 10**8; // 1 FTGP = $1
     uint256 public constant ETH_TO_USD_RATE = 3000 * 10**8; // $3000
     uint256 public constant LTV_RATIO = 40; // 40%
@@ -25,6 +27,7 @@ contract FTGPtoken is ERC20, currConverter, Ownable {
 
     mapping(address => LoanInfo) public userLoans;
     mapping(address => mapping(string => uint256)) public currencyLockedBalances;
+    event Redeemed(address indexed user, string toCurrency, uint256 tokenAmount, uint256 currencyAmount);
 
     event LoanIssued(address indexed borrower, uint256 collateralETH, uint256 loanFTGP, uint256 timestamp);
     event LoanRepaid(address indexed borrower, uint256 totalRepaid, uint256 timestamp);
@@ -33,7 +36,9 @@ contract FTGPtoken is ERC20, currConverter, Ownable {
         ERC20("FTGPtoken", "FTGP") 
         currConverter(address(this))
         Ownable(msg.sender)
-    {}
+    {
+        _initDepositLogic(address(this));
+    }
 
     function setPriceFeed(string memory currency, address priceFeedAddress) public onlyOwner override {
         priceFeeds[currency] = AggregatorV3Interface(priceFeedAddress);
@@ -77,6 +82,29 @@ contract FTGPtoken is ERC20, currConverter, Ownable {
         uint256 amountInTokens = amount * 10**18;
         return tokenTransfer.safeTransfer(IERC20(address(this)), msg.sender, receiver, amountInTokens);
     }
+
+    function depositFlexible(uint256 amount) external {
+       FTGPDepositLogic.openDeposit( amount);
+    }
+    function depositLockup(uint256 amount, uint256 period) external {
+        FTGPDepositLogic.lockupDeposit(amount, period);
+    }
+    function withdrawDeposit(uint256 index) external {
+        FTGPDepositLogic.withdraw( index);
+    }
+    function redeemTokens(string memory toCurrency, uint256 amount) public returns (uint256) {
+        uint256 amountInWei = amount * (10 ** decimals());
+        uint256 currencyAmount = tokenRedemption.redeemTokens(
+            IERC20(address(this)),
+            msg.sender,
+            toCurrency,
+            amountInWei,
+            getExchangeRate
+        );
+          emit Redeemed(msg.sender, toCurrency, amountInWei, currencyAmount);
+        return currencyAmount;
+    }
+        
 
     function getLoan() public payable {
         require(msg.value > 0, "Collateral must be greater than 0");
