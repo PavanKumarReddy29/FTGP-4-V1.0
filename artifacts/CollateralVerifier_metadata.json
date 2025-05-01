@@ -1,0 +1,344 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_ftgpTokenAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address payable",
+						"name": "_escrowWallet",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "collateralAmount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "loanAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "LoanIssued",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "FIXED_ETH_RATE",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "collateralAmountETH",
+						"type": "uint256"
+					}
+				],
+				"name": "calculateMaxLoan",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "escrowWallet",
+				"outputs": [
+					{
+						"internalType": "address payable",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "ftgpToken",
+				"outputs": [
+					{
+						"internalType": "contract FTGPtoken",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "getETHBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getLoan",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "getUserLoans",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "collateralAmount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "loanAmount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "timestamp",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "active",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct CollateralVerifier.Loan[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "loans",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "collateralAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "loanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {
+				"calculateMaxLoan(uint256)": {
+					"notice": "Get max loanable amount in FTGP tokens (LTV = 40%)"
+				},
+				"getETHBalance(address)": {
+					"notice": "Get ETH balance for verification"
+				},
+				"getLoan()": {
+					"notice": "Main loan issuance function (callable with ETH transfer)"
+				},
+				"getUserLoans(address)": {
+					"notice": "Get user's active loans"
+				}
+			},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"loanProcess.sol": "CollateralVerifier"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+			"keccak256": "0xfe4e8bb4861bb3860ba890ab91a3b818ec66e5a8f544fb608cfcb73f433472cd",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://644cff84052e1e82b5bb502b2a46e8f142a62b0db4cd9b38200798ba8373c6f7",
+				"dweb:/ipfs/QmTa99QHrJBn3SXDizquPBUiTxVCNKQrHgaWJhuds5Sce2"
+			]
+		},
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8ed324d3920bb545059d66ab97d43e43ee85fd3bd52e03e401f020afb0b120f6",
+				"dweb:/ipfs/QmfEckWLmZkDDcoWrkEvMWhms66xwTLff9DDhegYpvHo1a"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
+			"keccak256": "0x880da465c203cec76b10d72dbd87c80f387df4102274f23eea1f9c9b0918792b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://399594cd8bb0143bc9e55e0f1d071d0d8c850a394fb7a319d50edd55d9ed822b",
+				"dweb:/ipfs/QmbPZzgtT6LEm9CMqWfagQFwETbV1ztpECBB1DtQHrKiRz"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+			"keccak256": "0x41f6b3b9e030561e7896dbef372b499cc8d418a80c3884a4d65a68f2fdc7493a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://80b0992a11b2fd1f75ced2971696d07bbd1d19ce6761dd50d8b6d48aa435f42a",
+				"dweb:/ipfs/QmZDe5xd2gXHjVEjv9t8C1KQ68K5T8qFwdinwQgmP3rF3x"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0xe06a3f08a987af6ad2e1c1e774405d4fe08f1694b67517438b467cecf0da0ef7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://df6f0c459663c9858b6cba2cda1d14a7d05a985bed6d2de72bd8e78c25ee79db",
+				"dweb:/ipfs/QmeTTxZ7qVk9rjEv2R4CpCwdf8UMCcRqDNMvzNxHc3Fnn9"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+			"keccak256": "0x70f2f713b13b7ce4610bcd0ac9fec0f3cc43693b043abcb8dc40a42a726eb330",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c13d13304ac79a83ab1c30168967d19e2203342ebbd6a9bbce4db7550522dcbf",
+				"dweb:/ipfs/QmeN5jKMN2vw5bhacr6tkg78afbTTZUeaacNHqjWt4Ew1r"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6a708e8a5bdb1011c2c381c9a5cfd8a9a956d7d0a9dc1bd8bcdaf52f76ef2f12",
+				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
+			]
+		},
+		"FTGPtoken.sol": {
+			"keccak256": "0x63f7060ec7ea40554bb6f082c204cf52242e59242bc23ab2ee6f8a9cb564715e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://98c489ba7d82db8213e1d876a5fc5130c2c8877c5b621a2ebd115d4d223b93a7",
+				"dweb:/ipfs/QmcqrPuPE83D5sGVLy5iZEBY1amV5GSG2zKSD3i1j1wZ1z"
+			]
+		},
+		"currConverter.sol": {
+			"keccak256": "0xa17e155ed1ca6a6b361d3455927c88efad67bdfbbb73fe834813eb0c93f39cf9",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a1cd78728b9b05f27e448fe282850b401d2b0f258d8489ef09fec7662905b7f2",
+				"dweb:/ipfs/QmcLmZb3YTKfHQdems2SdhqN7dXJNx83wEZ3hD7BEpJEX3"
+			]
+		},
+		"loanProcess.sol": {
+			"keccak256": "0xc11d150c40f96035b04fa9c353af9858b0ca9721c8abed2bc57787869a31cb24",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://83e3e66de1f8a8a36caa52de6812d75c85043356899dfaf0fda1fff16731b4a0",
+				"dweb:/ipfs/QmNcT3y6uhAxLpk9YsFUamZAx8ecJTVcQATw6WsmtgWL2Y"
+			]
+		},
+		"tokenTransfer.sol": {
+			"keccak256": "0xf0490467f35ddb2470f5307387de9e8d584b0f6b12f5f0904ef94a9309c4ef63",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://96f8c0d989bdf88015dd2248fa6387df57eb3e0d922cfb26c87dfd1357dc76b8",
+				"dweb:/ipfs/QmTd8djdVpwnBChx5e9fixrx5kPZHtbBYj6a9arEuquyse"
+			]
+		}
+	},
+	"version": 1
+}
