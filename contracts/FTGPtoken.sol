@@ -3,12 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./currConverter.sol";
 import "./tokenTransfer.sol";
 import "./tokenRedemption.sol";
 import "./FTGPDepositLogic.sol";
 
-contract FTGPtoken is ERC20, currConverter,Ownable,FTGPDepositLogic {
+contract FTGPtoken is ERC20, currConverter,Ownable,FTGPDepositLogic, ReentrancyGuard {
     uint256 public constant TOKEN_PRICE_IN_USD = 1 * 10**8; // 1 FTGP = $1
     uint256 public constant ETH_TO_USD_RATE = 10 * 10**2; // $3000
     uint256 public constant LTV_RATIO = 40; // 40%
@@ -107,7 +108,7 @@ contract FTGPtoken is ERC20, currConverter,Ownable,FTGPDepositLogic {
     }
 
 
-    function getLoan() public payable {
+    function getLoan() public payable nonReentrant {
         require(msg.value > 0, "Collateral must be greater than 0");
         require(userLoans[msg.sender].loanAmountInFTGP == 0, "Loan already exists");
 
@@ -143,7 +144,7 @@ contract FTGPtoken is ERC20, currConverter,Ownable,FTGPDepositLogic {
         return (loan.monthlyInstallment, loan.repaymentDue);
     }
 
-    function convertAndRepay(string memory fromCurrency, uint256 amountInCurrency) public {
+    function convertAndRepay(string memory fromCurrency, uint256 amountInCurrency) public nonReentrant{
     LoanInfo storage loan = userLoans[msg.sender];
     require(loan.loanAmountInFTGP > 0, "No active loan");
 
