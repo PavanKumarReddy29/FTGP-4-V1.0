@@ -46,7 +46,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto space-y-10">
 
         {/* Top user info */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#1e2026] p-6 rounded-xl shadow">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#1e2026] p-6 rounded-xl shadow relative">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-yellow-400 flex items-center justify-center text-black text-xl font-bold">🧑</div>
             <div>
@@ -61,16 +61,37 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <div className="mt-4 sm:mt-0 text-sm text-gray-400">
-            VIP Level: <span className="text-yellow-400 font-semibold">Regular User</span>
+          <div className="mt-4 sm:mt-0 flex flex-col items-end gap-2">
+            <span className="text-sm text-gray-400">
+              VIP Level: <span className="text-yellow-400 font-semibold">Regular User</span>
+            </span>
+            <button
+                onClick={() => {
+                  document.cookie = 'wallet=; Max-Age=0; path=/'
+                  localStorage.removeItem('wallet')
+                  router.replace('/')
+                }}
+                className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded font-semibold text-sm transition"
+              >
+                Log out
+              </button>
           </div>
         </div>
 
         {/* Balance section */}
-        <div className="bg-[#1e2026] p-6 rounded-xl shadow">
-          <h3 className="text-xl font-semibold mb-2">Estimated Balance</h3>
-          <p className="text-3xl font-bold text-yellow-400">{ftgpBalance} FTGP</p>
-          <p className="text-gray-400">≈ ${ftgpBalance}</p>
+        <div className="bg-[#1e2026] p-6 rounded-xl shadow flex flex-col justify-between h-48 relative">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Estimated Balance</h3>
+            <p className="text-3xl font-bold text-yellow-400">{ftgpBalance} FTGP</p>
+            <p className="text-gray-400">≈ ${ftgpBalance}</p>
+          </div>
+          <div className="self-end mt-4">
+            <Link href="/redeem">
+              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-2 rounded font-semibold text-sm transition">
+                Redeem
+              </button>
+            </Link>
+          </div>
         </div>
 
         {/* Function modules */}
@@ -79,7 +100,7 @@ export default function Dashboard() {
           {/* Trade */}
           <Link href="/transaction" className="group bg-[#1e2026] rounded-xl p-6 border border-transparent hover:border-yellow-400 transition duration-300 flex flex-col justify-between">
             <div>
-              <h4 className="text-xl font-semibold mb-2">💱 Trade</h4>
+              <h4 className="text-xl font-semibold mb-2">💱 Transfer and Trade</h4>
               <p className="text-gray-400 text-sm mb-6">Convert fiat to FTGP tokens or redeem tokens back to cash.</p>
             </div>
             <button className="self-end bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-400 font-semibold text-sm">Enter</button>
@@ -107,12 +128,3 @@ export default function Dashboard() {
     </main>
   )
 }
-
-
-
-
-
-
-
-
-

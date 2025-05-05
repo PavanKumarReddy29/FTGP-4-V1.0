@@ -22,7 +22,7 @@ export default function SignUp() {
 
     const userData = { firstName, lastName, email, wallet }
     localStorage.setItem(`user_${email}`, JSON.stringify(userData))
-    alert('Registration successful ✅ Please log in!')
+    alert('Registration successful Please log in!')
     router.push('/login')
   }
 

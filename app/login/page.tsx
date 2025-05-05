@@ -21,8 +21,11 @@ export default function Login() {
     const userData = JSON.parse(storedData)
 
     if (userData.wallet === wallet) {
-      alert('Login successful ✅')
+      alert('Login successful')
       localStorage.setItem('wallet', wallet)
+
+      document.cookie = `wallet=${wallet}; path=/; SameSite=Lax`
+
       router.push('/dashboard')
     } else {
       alert('Wallet address does not match. Please check again!')
